@@ -24,9 +24,9 @@ export default function (state, action) {
         }, projects: [] })
 
     case 'USER_CREDIT_CHANGED':
-      return Object.assign({}, state, {
-        user: Object.assign({}, state.user, { credit: action.credit })
-      })
+        return Object.assign({}, state, {
+            user: Object.assign({}, state.user, { credit: action.credit }),
+        })
 
     case 'PROJECT_CREATED':
     case 'PROJECT_FETCHED':

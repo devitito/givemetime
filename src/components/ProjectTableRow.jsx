@@ -10,7 +10,6 @@ import { getGraphQL, projectDeleted, userCreditChanged } from '../actions.js'
 
 
 export class ProjectTableRow extends React.Component {
-
     render () {
         return (
           <Card onTouchTap={this.handleDiscoverClick} expanded={null} expandable={false} initiallyExpanded={false}>
@@ -56,11 +55,11 @@ ProjectTableRow.propTypes = {
     onDelete: PropTypes.func.isRequired,
     user: PropTypes.shape({
         id: PropTypes.string,
-    }).isRequired
+    }).isRequired,
 }
 
 
-const mapDispatchToProps = (dispatch, ownProps) => {
+const mapDispatchToProps = (dispatch) => {
     return {
         onDelete: (id, userId) => {
             dispatch(getGraphQL(`
@@ -82,18 +81,18 @@ const mapDispatchToProps = (dispatch, ownProps) => {
                     }
                 }`,
                 { rowId: id,
-                 userId: userId
+                 userId: userId,
                },
                 (response) => {
-                  dispatch(projectDeleted(response.deleteProjectAndLog.output.id))
-                  dispatch(userCreditChanged(response.deleteProjectAndLog.viewer.person.credit))
+                    dispatch(projectDeleted(response.deleteProjectAndLog.output.id))
+                    dispatch(userCreditChanged(response.deleteProjectAndLog.viewer.person.credit))
                 }
             ))
         },
     }
 }
 
-const mapStateToProps = (state, onwProps) => {
+const mapStateToProps = (state) => {
     return {
         user: state.user,
     }

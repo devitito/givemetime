@@ -45,10 +45,10 @@ export const userLoggedOut = () => {
     }
 }
 export const userCreditChanged = (newCredit) => {
-  return {
-    type: 'USER_CREDIT_CHANGED',
-    credit: newCredit,
-  }
+    return {
+        type: 'USER_CREDIT_CHANGED',
+        credit: newCredit,
+    }
 }
 
 export const projectFetched = (id, row_id, title, estimate, acquired, description, author) => {
