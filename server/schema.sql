@@ -67,6 +67,17 @@ comment on column person_account.person_id is 'The id of the person associated w
 comment on column person_account.email is 'The email address of the person.';
 comment on column person_account.pass_hash is 'An opaque hash of the person’s password.';
 
+create table give_me_time_utils.log (
+  person_id        int not null references person(id),
+  project_id       int not null references project(id),
+  amount           int not null
+);
+
+comment on table log is 'Private information about recorded transfers.';
+comment on column log.person_id is 'The id of the person associated with this transfer.';
+comment on column log.project_id is 'The id of the project associated with this transfer.';
+comment on column log.amount is 'The amount of credits transfered from the person to the project.';
+
 -------------------------------------------------------------------------------
 -- Query Procedures
 
@@ -154,6 +165,10 @@ begin
   update person set credit = credit - amount where id = person_id;
   update project set acquired = acquired + amount where id = project_id
     returning * into project_row;
+
+  -- add log
+  insert into log (person_id, project_id, amount) values
+    (person_id, project_id, amount);
 
   return project_row;
 end;
