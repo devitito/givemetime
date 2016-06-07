@@ -6,10 +6,11 @@ import { Card, CardActions, CardHeader, CardText } from 'material-ui/Card'
 import ProjectDialog from './ProjectDialog.jsx'
 import GiveTimeDialog from './GiveTimeDialog.jsx'
 import { connect } from 'react-redux'
-import { getGraphQL, projectDeleted } from '../actions.js'
+import { getGraphQL, projectDeleted, userCreditChanged } from '../actions.js'
 
 
 export class ProjectTableRow extends React.Component {
+
     render () {
         return (
           <Card onTouchTap={this.handleDiscoverClick} expanded={null} expandable={false} initiallyExpanded={false}>
@@ -35,7 +36,7 @@ export class ProjectTableRow extends React.Component {
                       author={this.props.author}
                       estimate={this.props.estimate}
                       acquired={this.props.acquired} />
-                    <IconButton onTouchTap={() => this.props.onDelete.call(this, this.props.rowId)}>
+                    <IconButton onTouchTap={() => this.props.onDelete.call(this, this.props.rowId, this.props.user.id)}>
                       <ActionDelete />
                   </IconButton>
               </CardActions>
@@ -53,29 +54,49 @@ ProjectTableRow.propTypes = {
     estimate: PropTypes.number.isRequired,
     acquired: PropTypes.number.isRequired,
     onDelete: PropTypes.func.isRequired,
+    user: PropTypes.shape({
+        id: PropTypes.string,
+    }).isRequired
 }
 
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = (dispatch, ownProps) => {
     return {
-        onDelete: (id) => {
+        onDelete: (id, userId) => {
             dispatch(getGraphQL(`
-                mutation deleteProject(
+                mutation deleteProjectAndLog(
                     $rowId: Int!
+                    $userId: ID!
                 ) {
-                    deleteProject(input: {
+                    deleteProjectAndLog(input: {
                         rowId: $rowId
                     }) {
-                        project {
+                        output {
                           id
+                        }
+                        viewer {
+                          person(id: $userId) {
+                            credit
+                          }
                         }
                     }
                 }`,
-                { rowId: id },
-                (response) => dispatch(projectDeleted(response.deleteProject.project.id))
+                { rowId: id,
+                 userId: userId
+               },
+                (response) => {
+                  dispatch(projectDeleted(response.deleteProjectAndLog.output.id))
+                  dispatch(userCreditChanged(response.deleteProjectAndLog.viewer.person.credit))
+                }
             ))
         },
     }
 }
 
-export default connect(null, mapDispatchToProps)(ProjectTableRow)
+const mapStateToProps = (state, onwProps) => {
+    return {
+        user: state.user,
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ProjectTableRow)

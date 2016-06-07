@@ -176,6 +176,32 @@ $$ language plpgsql strict set search_path from current;
 
 comment on function project_give_time(integer, integer, integer) is 'Transfer credits from a user to a project.';
 
+create function delete_project_and_log(row_id integer) returns project as $$
+declare
+  project_row project;
+  amount int;
+  line RECORD;
+begin
+  -- check if the project exists
+  select * from project where id = row_id into project_row;
+  if (project_row.id is null) then
+    raise exception 'Project % does not exists', row_id;
+  end if;
+
+  --credit person back
+  for line in select * from give_me_time_utils.log where project_id = row_id loop
+    select credit into amount from person where id = line.person_id;
+    amount := amount + line.amount;
+    execute 'update person set credit = ' || amount || ' where id = ' || line.person_id;
+  end loop;
+
+  --delete log of this project
+  delete from give_me_time_utils.log where project_id = row_id;
+  delete from project where id = row_id;
+
+  return project_row;
+end;
+$$ language plpgsql strict set search_path from current;
 
 -------------------------------------------------------------------------------
 -- Triggers

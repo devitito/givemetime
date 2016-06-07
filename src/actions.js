@@ -44,6 +44,13 @@ export const userLoggedOut = () => {
         projects : [],
     }
 }
+export const userCreditChanged = (newCredit) => {
+  return {
+    type: 'USER_CREDIT_CHANGED',
+    credit: newCredit,
+  }
+}
+
 export const projectFetched = (id, row_id, title, estimate, acquired, description, author) => {
     return {
         type: 'PROJECT_FETCHED',
