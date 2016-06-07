@@ -35,7 +35,7 @@ export class ProjectTableRow extends React.Component {
                       author={this.props.author}
                       estimate={this.props.estimate}
                       acquired={this.props.acquired} />
-                    <IconButton onTouchTap={() => this.props.onDelete.call(this, this.props.id)}>
+                    <IconButton onTouchTap={() => this.props.onDelete.call(this, this.props.rowId)}>
                       <ActionDelete />
                   </IconButton>
               </CardActions>
@@ -61,16 +61,18 @@ const mapDispatchToProps = (dispatch) => {
         onDelete: (id) => {
             dispatch(getGraphQL(`
                 mutation deleteProject(
-                    $id: ID!
+                    $rowId: Int!
                 ) {
                     deleteProject(input: {
-                        id: $id
+                        rowId: $rowId
                     }) {
-                        id
+                        project {
+                          id
+                        }
                     }
                 }`,
-                { id: id },
-                (response) => dispatch(projectDeleted(response.deleteProject.id))
+                { rowId: id },
+                (response) => dispatch(projectDeleted(response.deleteProject.project.id))
             ))
         },
     }

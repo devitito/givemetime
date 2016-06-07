@@ -109,7 +109,7 @@ const mapDispatchToProps = (dispatch) => {
                     userRowId: userRowId,
                     projectRowId: projectRowId,
                 },
-                () => {
+                (response) => {
                     dispatch(giveTime(amount, projectRowId))
                     dispatch(closeGiveTimeDialog())
                 }

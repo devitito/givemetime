@@ -78,7 +78,7 @@ export default function (state, action) {
     case 'GIVE_TIME':
         return Object.assign({}, state, {
             projects: state.projects.map(
-                (project) => project.id === action.id
+                (project) => project.rowId === action.id
                     ? Object.assign({}, project, { acquired: project.acquired + action.amount })
                     : project
             ),
